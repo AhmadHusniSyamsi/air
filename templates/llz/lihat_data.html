@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Daftar Ground Check</h2>
+    <a href="{{ url_for('groundcheck.ground_check') }}" class="btn btn-primary mb-3">+ Input Baru</a>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Lokasi</th>
+                <th>Tanggal</th>
+                <th>Teknisi</th>
+                <th>Paraf</th>
+                <th>Catatan</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for gc in ground_check %}
+            <tr>
+                <td>{{ gc.id }}</td>
+                <td>{{ gc.lokasi }}</td>
+                <td>{{ gc.tanggal.strftime("%d-%m-%Y") }}</td>
+                <td>{{ gc.teknisi }}</td>
+                <td>{{ gc.paraf }}</td>
+                <td>{{ gc.catatan }}</td>
+                <td>
+                    <a href="{{ url_for('groundcheck.detail_data', id=gc.id) }}" class="btn btn-info btn-sm">Detail</a>
+                    <a href="{{ url_for('groundcheck.edit_ground_check', id=gc.id) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{{ url_for('groundcheck.delete_ground_check', id=gc.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Hapus data ini?')">Delete</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="text-center">Belum ada data</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

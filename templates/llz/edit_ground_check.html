@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Ground Check</h2>
+
+    <form method="POST">
+        <div class="mb-3">
+            <label>Lokasi</label>
+            <input type="text" name="lokasi" class="form-control" value="{{ gc.lokasi }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Tanggal</label>
+            <input type="date" name="tanggal" class="form-control" value="{{ gc.tanggal.strftime('%Y-%m-%d') }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Teknisi</label>
+            <input type="text" name="teknisi[]" class="form-control" value="{{ gc.teknisi }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Paraf</label>
+            <input type="text" name="paraf" class="form-control" value="{{ gc.paraf }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Catatan</label>
+            <textarea name="catatan" class="form-control">{{ gc.catatan }}</textarea>
+        </div>
+
+        <h4 class="mt-4">Data Tabel</h4>
+        <input type="hidden" name="row_count" value="{{ gc.data_tabel|length }}">
+
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Freq</th>
+                    <th>Jarak</th>
+                    <th>Degree</th>
+                    <th>TX1 DDM %</th>
+                    <th>TX1 DDM µA</th>
+                    <th>TX1 SUM</th>
+                    <th>TX1 MOD90</th>
+                    <th>TX1 MOD150</th>
+                    <th>TX1 RF</th>
+                    <th>TX2 DDM %</th>
+                    <th>TX2 DDM µA</th>
+                    <th>TX2 SUM</th>
+                    <th>TX2 MOD90</th>
+                    <th>TX2 MOD150</th>
+                    <th>TX2 RF</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in gc.data_tabel %}
+                <tr>
+                    <td><input type="text" name="freq_{{ loop.index0 }}" value="{{ row.freq }}" class="form-control"></td>
+                    <td><input type="text" name="jarak_{{ loop.index0 }}" value="{{ row.jarak }}" class="form-control"></td>
+                    <td><input type="text" name="degree_{{ loop.index0 }}" value="{{ row.degree }}" class="form-control"></td>
+
+                    <td><input type="text" name="tx1_ddm_persen_{{ loop.index0 }}" value="{{ row.tx1_ddm_persen }}" class="form-control"></td>
+                    <td><input type="text" name="tx1_ddm_ua_{{ loop.index0 }}" value="{{ row.tx1_ddm_ua }}" class="form-control"></td>
+                    <td><input type="text" name="tx1_sum_{{ loop.index0 }}" value="{{ row.tx1_sum }}" class="form-control"></td>
+                    <td><input type="text" name="tx1_mod90_{{ loop.index0 }}" value="{{ row.tx1_mod90 }}" class="form-control"></td>
+                    <td><input type="text" name="tx1_mod150_{{ loop.index0 }}" value="{{ row.tx1_mod150 }}" class="form-control"></td>
+                    <td><input type="text" name="tx1_rf_{{ loop.index0 }}" value="{{ row.tx1_rf }}" class="form-control"></td>
+
+                    <td><input type="text" name="tx2_ddm_persen_{{ loop.index0 }}" value="{{ row.tx2_ddm_persen }}" class="form-control"></td>
+                    <td><input type="text" name="tx2_ddm_ua_{{ loop.index0 }}" value="{{ row.tx2_ddm_ua }}" class="form-control"></td>
+                    <td><input type="text" name="tx2_sum_{{ loop.index0 }}" value="{{ row.tx2_sum }}" class="form-control"></td>
+                    <td><input type="text" name="tx2_mod90_{{ loop.index0 }}" value="{{ row.tx2_mod90 }}" class="form-control"></td>
+                    <td><input type="text" name="tx2_mod150_{{ loop.index0 }}" value="{{ row.tx2_mod150 }}" class="form-control"></td>
+                    <td><input type="text" name="tx2_rf_{{ loop.index0 }}" value="{{ row.tx2_rf }}" class="form-control"></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success">Simpan Perubahan</button>
+        <a href="{{ url_for('groundcheck.lihat_data') }}" class="btn btn-secondary">Batal</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Detail Ground Check - {{ record.nama_alat or record.id }}</h2>
+  
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <p><strong>Tanggal:</strong> {{ record.tanggal.strftime('%Y-%m-%d') }}</p>
+      <p><strong>Lokasi:</strong> {{ record.lokasi }}</p>
+    </div>
+    <div class="col-md-6">
+      <p><strong>Teknisi:</strong> {{ record.teknisi or '-' }}</p>
+      <p><strong>Paraf:</strong> {{ record.paraf or '-' }}</p>
+    </div>
+  </div>
+
+  <p><strong>Catatan:</strong> {{ record.catatan or '-' }}</p>
+
+  <!-- ==================== TABEL DATA ==================== -->
+  <h4 class="mt-4">Data Tabel</h4>
+  <table class="table table-bordered table-striped table-sm mt-3">
+    <thead class="table-dark">
+      <tr>
+        <th>Freq</th>
+        <th>Jarak</th>
+        <th>Degree</th>
+        <th>TX1 DDM %</th>
+        <th>TX1 DDM μA</th>
+        <th>TX1 SUM</th>
+        <th>TX1 Mod 90</th>
+        <th>TX1 Mod 150</th>
+        <th>TX1 RF</th>
+        <th>TX2 DDM %</th>
+        <th>TX2 DDM μA</th>
+        <th>TX2 SUM</th>
+        <th>TX2 Mod 90</th>
+        <th>TX2 Mod 150</th>
+        <th>TX2 RF</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.freq }}</td>
+        <td>{{ row.jarak }}</td>
+        <td>{{ row.degree }}</td>
+        <td>{{ row.tx1_ddm_persen if row.tx1_ddm_persen is not none else '-' }}</td>
+        <td>{{ row.tx1_ddm_ua if row.tx1_ddm_ua is not none else '-' }}</td>
+        <td>{{ row.tx1_sum if row.tx1_sum is not none else '-' }}</td>
+        <td>{{ row.tx1_mod90 if row.tx1_mod90 is not none else '-' }}</td>
+        <td>{{ row.tx1_mod150 if row.tx1_mod150 is not none else '-' }}</td>
+        <td>{{ row.tx1_rf if row.tx1_rf is not none else '-' }}</td>
+        <td>{{ row.tx2_ddm_persen if row.tx2_ddm_persen is not none else '-' }}</td>
+        <td>{{ row.tx2_ddm_ua if row.tx2_ddm_ua is not none else '-' }}</td>
+        <td>{{ row.tx2_sum if row.tx2_sum is not none else '-' }}</td>
+        <td>{{ row.tx2_mod90 if row.tx2_mod90 is not none else '-' }}</td>
+        <td>{{ row.tx2_mod150 if row.tx2_mod150 is not none else '-' }}</td>
+        <td>{{ row.tx2_rf if row.tx2_rf is not none else '-' }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="15" class="text-center">Tidak ada data</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- ==================== GRAFIK ==================== -->
+  <h4 class="mt-5">Grafik Ground Check</h4>
+  <canvas id="chartTx1"></canvas>
+  <canvas id="chartTx2" class="mt-4"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+  <script>
+   document.addEventListener("DOMContentLoaded", function() {
+    // data dari Python ke JS
+    let degrees = {{ rows|map(attribute='degree')|list|tojson }};
+    let tx1     = {{ rows|map(attribute='tx1_ddm_persen')|list|tojson }};
+    let tx2     = {{ rows|map(attribute='tx2_ddm_persen')|list|tojson }};
+
+    function renderChart(canvasId, label, rawData, color) {
+      new Chart(document.getElementById(canvasId).getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: degrees,
+          datasets: [{
+            label: label,
+            data: rawData.map(v => v !== null ? Math.abs(v) : null),
+            borderColor: color,
+            backgroundColor: color.replace('1)', '0.1)'),
+            pointBackgroundColor: color,
+            pointRadius: 4,
+            tension: 0.2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: label + ' Ground Performance Curve',
+              font: { size: 18, weight: 'bold' }
+            },
+            datalabels: {
+              color: 'black',
+              align: 'top',
+              formatter: (value, ctx) => {
+                let raw = rawData[ctx.dataIndex];
+                return raw !== null ? raw.toFixed(2) : '';
+              }
+            }
+          },
+          scales: {
+            x: { title: { display: true, text: 'Degree (°)' } },
+            y: { title: { display: true, text: 'DDM (%)' } }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+    }
+
+    renderChart('chartTx1', 'TX1', tx1, 'rgba(0,0,255,1)');
+    renderChart('chartTx2', 'TX2', tx2, 'rgba(255,0,0,1)');
+  });
+  </script>
+</div>
+{% endblock %}

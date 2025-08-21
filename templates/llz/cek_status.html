@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center fw-bold">Cek Status Ground Check Localizer</h2>
+    <div class="text-center mt-4">
+        <img src="{{ url_for('static', filename='img/airnav_logo.png') }}" width="200" alt="Logo AirNav">
+    </div>
+
+    <div class="table-responsive mt-5">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>NO</th>
+                    <th>LOKASI</th>
+                    <th>TANGGAL</th>
+                    <th>NAMA TEKNISI</th>
+                    <th>MANAGER TEKNIK</th>
+                    <th>STATUS</th>
+                    <th>CETAK</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for gc in ground_check %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ gc.lokasi }}</td>
+                    <td>{{ gc.tanggal }}</td>
+                    <td>{{ gc.teknisi }}</td>
+                    <td>{{ gc.manager }}</td>
+                    <td>
+                        {% if gc.status == "Selesai" %}
+                            <span class="badge bg-success">{{ gc.status }}</span>
+                        {% elif gc.status == "Proses" %}
+                            <span class="badge bg-warning text-dark">{{ gc.status }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ gc.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('cetak_gc', id=gc.id) }}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-printer-fill"></i> Cetak
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
